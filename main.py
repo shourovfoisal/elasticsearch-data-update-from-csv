@@ -1,26 +1,23 @@
 import pandas as pd
-from elasticsearch import Elasticsearch
+from configs import es_index, es_client
 from process_data import process_data
 
-# Change here
-es_index = "products-v2"
-
-# Client
-es = Elasticsearch("http://localhost:9200")
-
 # Read file
-dataframe = pd.read_csv("input/data.csv", nrows=100, encoding="utf8")
+dataframe = pd.read_csv("input/data.csv", nrows=200, encoding="utf8")
 
 # Updatable columns
-columns = dataframe.columns.tolist()
-if "id" in columns: columns.remove("id")
+columnNames = dataframe.columns.tolist()
+if "id" in columnNames: columnNames.remove("id")
+
+totalCount = len(dataframe)
+tenPercentOfTotalCount = int(totalCount/10)
 
 for index, row in dataframe.iterrows():
   doc = dict()
-  
-  for column in columns:
-    doc[column]=process_data(column, row[column])
+  for columnName in columnNames:
+    doc[columnName]=process_data(columnName, row[columnName])
   
   payload = {"doc": doc}
+  es_client.update(index=es_index, id=row['id'].replace(",", ""), body=payload)
   
-  es.update(index=es_index, id=row['id'].replace(",", ""), body=payload)
+  if((index + 1) % tenPercentOfTotalCount == 0): print(f"Progress {int(((index + 1) * 100) / totalCount)}%", )
