@@ -42,7 +42,7 @@ for index, row in dataframe.iterrows():
           error_type = error_description["type"]
           error_reason = error_description["reason"]
           
-          print(f"\nError occured with item id {item_id}")
+          print(f"\nError occured with document id {item_id}")
           print(f"Error type: {error_type}")
           print(f"Error reason: {error_reason}")
             
