@@ -1,5 +1,8 @@
 import pandas as pd
 import math
+import os
+import json
+import sys
 from time import time
 from configs import es_index, es_client, batch_size
 from process_data import process_data
@@ -36,19 +39,26 @@ for index, row in dataframe.iterrows():
         for item in response["items"]:
           operation_description = item["update"]
           
-          item_id = operation_description["_id"]
+          if "error" in operation_description:
+            item_id = operation_description["_id"]
+            error_description = operation_description["error"]
+            error_type = error_description["type"]
+            error_reason = error_description["reason"]
           
-          error_description = operation_description["error"]
-          error_type = error_description["type"]
-          error_reason = error_description["reason"]
-          
-          print(f"\nError occured with document id {item_id}")
-          print(f"Error type: {error_type}")
-          print(f"Error reason: {error_reason}")
+            print(f"\nError occured with document id {item_id}")
+            print(f"Error type: {error_type}")
+            print(f"Error reason: {error_reason}")
             
       request_body_ndjson.clear()
     except Exception as e:
-      print(f"Bulk upload exception {e}")
+      print("\nBulk upload exception")
+      print(e)
+      os.makedirs("error_json", exist_ok=True)
+      file_path = os.path.join("error_json", "docs_with_error.json")
+      with open(file_path, "w", encoding="utf-8") as outfile:
+        outfile.writelines(json.dumps(request_body_ndjson, ensure_ascii=False) + "\n")
+        outfile.write("\n")
+      sys.exit()
   
   current_percentage = math.ceil(((index+1) / totalCount) * 100)
   if(current_percentage % 5 == 0 and current_percentage != last_percentage):
