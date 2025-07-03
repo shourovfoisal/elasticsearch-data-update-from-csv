@@ -23,7 +23,13 @@ for index, row in dataframe.iterrows():
     doc[columnName]=process_data(columnName, row[columnName])
   
   payload = {"doc": doc}
-  es_client.update(index=es_index, id=row['id'].replace(",", ""), body=payload)
+  
+  try:
+    es_client.update(index=es_index, id=row['id'].replace(",", ""), body=payload)
+  except:
+    print(f"Error while updating document with id {row['id']}")
+    print("Payload:")
+    print(payload)
   
   current_percentage = math.ceil(((index+1) / totalCount) * 100)
   if(current_percentage % 5 == 0 and current_percentage != last_percentage):
