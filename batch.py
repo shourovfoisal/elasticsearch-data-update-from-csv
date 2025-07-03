@@ -31,12 +31,24 @@ for index, row in dataframe.iterrows():
   
   if((index+1) % batch_size == 0):
     try:
-      es_client.bulk(index=es_index, body=request_body_ndjson)
+      response = es_client.bulk(index=es_index, body=request_body_ndjson)
+      if response.get("errors"):
+        for item in response["items"]:
+          operation_description = item["update"]
+          
+          item_id = operation_description["_id"]
+          
+          error_description = operation_description["error"]
+          error_type = error_description["type"]
+          error_reason = error_description["reason"]
+          
+          print(f"\nError occured with item id {item_id}")
+          print(f"Error type: {error_type}")
+          print(f"Error reason: {error_reason}")
+            
       request_body_ndjson.clear()
-    except:
-      print(f"Error while updating document with id {row['id']}")
-      print("Payload:")
-      print(payload)
+    except Exception as e:
+      print(f"Bulk upload exception {e}")
   
   current_percentage = math.ceil(((index+1) / totalCount) * 100)
   if(current_percentage % 5 == 0 and current_percentage != last_percentage):
