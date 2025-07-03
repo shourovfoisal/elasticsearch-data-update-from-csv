@@ -5,16 +5,17 @@ boolean_true_data_patterns = {"true", "TRUE", "True"}
 boolean_false_data_patterns = {"false", "FALSE", "False"}
 
 def process_data(columnName, data):
-  if(data in empty_data_patterns): return None
+  if(data in empty_data_patterns): return handle_empty_data(data)
   if(data in boolean_true_data_patterns): return True
   if(data in boolean_false_data_patterns): return False
   if(is_number(data)): return string_to_number(data)
   if(columnName in array_fields): return string_to_array(data)
+  return data
 
 # Sample input: "scented candles, decorative candleholders, pillar candles"
 def string_to_array(str):
   item_list = str.split(",")
-  return [item.strip() for item in item_list]
+  return [string_to_number(item.strip()) if is_number(item.strip()) else item.strip() for item in item_list]
 
 def string_to_number(str):
   return int(str) if float(str).is_integer() else float(str)
@@ -25,3 +26,7 @@ def is_number(str):
     return True
   except ValueError:
     return False
+  
+def handle_empty_data(str):
+  if str == "(empty)": return ""
+  if str == "-": return None
