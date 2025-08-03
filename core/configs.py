@@ -12,5 +12,5 @@ file_name = "data.csv"
 
 
 # Frequently Changing Configs
-es_index = "products-v1-1"
+es_index = ""
 data_source = KIBANA
