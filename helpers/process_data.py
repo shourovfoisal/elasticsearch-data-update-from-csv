@@ -1,10 +1,12 @@
 import ast
+import traceback
 from core.configs import data_source
 from core.const import (
   DATA_SOURCE_PYTHON as PYTHON, 
   DATA_SOURCE_JAVA as JAVA, 
   DATA_SOURCE_KIBANA as KIBANA
 )
+from helpers.log import write_log
 
 array_fields = {"tags", "images", "textEmbedding", "imageEmbedding"}
 empty_data_patterns = {"(empty)", "-"}
@@ -29,7 +31,15 @@ def process_data(columnName, data):
   
   except Exception as e:
     print(e)
-    print(f"Error happened for column: {columnName} and data: {data}")
+    # print(f"Error happened for column: {columnName} and data: {data}")
+    error_message = (
+        f"Exception occurred in process_data:\n"
+        f"Column: {columnName}\n"
+        f"Data: {data}\n"
+        f"Error: {str(e)}\n"
+        f"Traceback:\n{traceback.format_exc()}"
+    )
+    write_log(error_message)
 
 # Sample input: "scented candles, decorative candleholders, pillar candles"
 def string_to_array(data):
