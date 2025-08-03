@@ -1,8 +1,15 @@
+
+
+
+#####################################################
+# THIS SINGLE REQUEST FILE IS NOT MAINTAINED ANYMORE
+#####################################################
+
 import pandas as pd
 import math
 from time import time
 from core.configs import es_index, es_client
-from core.process_data import process_data
+from helpers.process_data import process_data
 
 # Read file
 dataframe = pd.read_csv("input/data.csv", encoding="utf8")

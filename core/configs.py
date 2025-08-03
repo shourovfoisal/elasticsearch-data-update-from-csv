@@ -5,7 +5,12 @@ from core.const import (
   DATA_SOURCE_JAVA as JAVA
 )
 
-es_index = "products-v1-1"
-es_client = Elasticsearch("http://localhost:9200")
+# Infrequently Changing Configs
 batch_size = 1000
+es_client = Elasticsearch("http://localhost:9200")
+file_name = "data.csv"
+
+
+# Frequently Changing Configs
+es_index = "products-v1-1"
 data_source = KIBANA

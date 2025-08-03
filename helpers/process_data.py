@@ -1,6 +1,10 @@
 import ast
 from core.configs import data_source
-from core.const import DATA_SOURCE_PYTHON, DATA_SOURCE_JAVA, DATA_SOURCE_KIBANA
+from core.const import (
+  DATA_SOURCE_PYTHON as PYTHON, 
+  DATA_SOURCE_JAVA as JAVA, 
+  DATA_SOURCE_KIBANA as KIBANA
+)
 
 array_fields = {"tags", "images", "textEmbedding", "imageEmbedding"}
 empty_data_patterns = {"(empty)", "-"}
@@ -14,11 +18,11 @@ def process_data(columnName, data):
       return string_to_number(data.replace(",", "")) if ',' in data else string_to_number(data)
     
     if(columnName in array_fields):
-      if(data_source == DATA_SOURCE_KIBANA):
+      if(data_source == KIBANA):
         return string_to_array(data)
-      elif(data_source == DATA_SOURCE_JAVA):
+      elif(data_source == JAVA):
         return parse_java_list_strings(data)
-      elif(data_source == DATA_SOURCE_PYTHON):
+      elif(data_source == PYTHON):
         return parse_python_array_literal(data)
       
     return data
