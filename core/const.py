@@ -1,0 +1,3 @@
+DATA_SOURCE_PYTHON = "python"
+DATA_SOURCE_KIBANA = "kibana"
+DATA_SOURCE_JAVA = "java"

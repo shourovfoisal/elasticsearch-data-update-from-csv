@@ -3,3 +3,4 @@ output
 jsonout
 jsonoutpure
 __pycache__
+.vscode

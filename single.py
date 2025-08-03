@@ -1,8 +1,8 @@
 import pandas as pd
 import math
 from time import time
-from configs import es_index, es_client
-from process_data import process_data
+from core.configs import es_index, es_client
+from core.process_data import process_data
 
 # Read file
 dataframe = pd.read_csv("input/data.csv", encoding="utf8")

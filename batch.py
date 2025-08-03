@@ -4,8 +4,12 @@ import os
 import json
 import sys
 from time import time
-from configs import es_index, es_client, batch_size
-from process_data import process_data
+from core.configs import (
+  es_index, 
+  es_client, 
+  batch_size
+)
+from core.process_data import process_data
 
 # Read file
 dataframe = pd.read_csv("input/data.csv", encoding="utf8")
