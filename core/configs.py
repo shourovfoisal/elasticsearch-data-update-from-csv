@@ -8,8 +8,6 @@ from core.const import (
 # Infrequently Changing Configs
 batch_size = 1000
 es_client = Elasticsearch("http://localhost:9200")
-file_name = "data.csv"
-
 
 # Frequently Changing Configs
 es_index = ""

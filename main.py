@@ -1,16 +1,12 @@
-import pandas as pd
 import math
 import sys
 from time import time
-from core.configs import (
-  batch_size,
-  file_name,
-  es_index
-)
+from core.configs import batch_size, es_index
 from helpers.process_data import process_data
 from helpers.payload_constructor import prepare_payload
 from helpers.request_executor import send_request
 from helpers.log import write_log
+from helpers.file_reader import read_file
 
 # Check if index name is provided
 if not es_index.strip():
@@ -18,7 +14,7 @@ if not es_index.strip():
   sys.exit(1)
 
 # Read file
-dataframe = pd.read_csv(f"input/{file_name}", encoding="utf8")
+dataframe = read_file()
 
 # Updatable columns (the column 'id' is not needed here)
 columnNames = dataframe.columns.tolist()
