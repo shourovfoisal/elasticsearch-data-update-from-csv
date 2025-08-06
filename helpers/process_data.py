@@ -30,8 +30,6 @@ def process_data(columnName, data):
     return data
   
   except Exception as e:
-    print(e)
-    # print(f"Error happened for column: {columnName} and data: {data}")
     error_message = (
         f"Exception occurred in process_data:\n"
         f"Column: {columnName}\n"
