@@ -2,7 +2,7 @@ import pandas as pd
 from glob import glob
 
 def read_file():
-  csv_files = glob("input/*csv")
+  csv_files = glob("input/*.csv")
   if not csv_files:
     raise FileNotFoundError("No CSV file found in the 'input/' directory")
   elif len(csv_files) > 1:
