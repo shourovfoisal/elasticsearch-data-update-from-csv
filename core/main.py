@@ -5,10 +5,13 @@ from core.configs import batch_size, es_index
 from helpers.process_data import process_data
 from helpers.payload_constructor import prepare_payload
 from helpers.request_executor import send_request
-from helpers.log import write_log
+from helpers.log import write_log, clear_log
 from helpers.file_reader import read_file
 
 def main():
+  # Clear the log file before starting the program
+  clear_log()
+  
   # Check if index name is provided
   if not es_index.strip():
     print("Error: 'es_index' is not set. Please set it in the .env file.")
