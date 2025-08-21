@@ -10,5 +10,5 @@ batch_size = 1000
 es_client = Elasticsearch("http://localhost:9200")
 
 # Frequently Changing Configs
-es_index = ""
+es_index = "products-v1-1"
 data_source = KIBANA

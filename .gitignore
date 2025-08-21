@@ -5,3 +5,4 @@ jsonoutpure
 __pycache__
 .vscode
 logs
+.env
