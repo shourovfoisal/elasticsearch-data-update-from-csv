@@ -11,7 +11,7 @@ from helpers.file_reader import read_file
 def main():
   # Check if index name is provided
   if not es_index.strip():
-    print("Error: 'es_index' is not set. Please set it in the core/configs.py file.")
+    print("Error: 'es_index' is not set. Please set it in the .env file.")
     sys.exit(1)
 
   # Read file

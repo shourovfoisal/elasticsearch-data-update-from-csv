@@ -1,14 +1,13 @@
+import os
 from elasticsearch import Elasticsearch
-from core.const import (
-  DATA_SOURCE_PYTHON as PYTHON, 
-  DATA_SOURCE_KIBANA as KIBANA, 
-  DATA_SOURCE_JAVA as JAVA
-)
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Infrequently Changing Configs
-batch_size = 1000
-es_client = Elasticsearch("http://localhost:9200")
+batch_size = int(os.getenv("ES_UPDATE_BATCH_SIZE"))
+es_client = Elasticsearch(os.getenv("ES_UPDATE_ELASTICSEARCH_URL"))
 
 # Frequently Changing Configs
-es_index = "products-v1-1"
-data_source = KIBANA
+es_index = os.getenv("ES_UPDATE_INDEX_NAME")
+data_source = os.getenv("ES_UPDATE_DATA_SOURCE")
