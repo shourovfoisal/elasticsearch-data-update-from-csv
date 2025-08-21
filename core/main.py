@@ -47,7 +47,7 @@ def main():
       last_percentage = current_percentage
 
   # Upload the remaining
-  send_request(request_body_ndjson)
+  if(len(request_body_ndjson) > 0): send_request(request_body_ndjson)
 
   write_log(f"Elapsed time {round(time() - start_time, 2)} seconds", True)
   
