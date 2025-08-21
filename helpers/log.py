@@ -3,7 +3,7 @@ from datetime import datetime
 
 LOG_FOLDER = "logs"
 
-def write_log(message, should_print):
+def write_log(message, should_print=False):
   os.makedirs(LOG_FOLDER, exist_ok=True)
   file_path = os.path.join(LOG_FOLDER, "log.txt")
   timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
