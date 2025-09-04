@@ -6,27 +6,30 @@ from core.const import (
   DATA_SOURCE_JAVA as JAVA, 
   DATA_SOURCE_KIBANA as KIBANA
 )
+import pandas as pd
 from helpers.log import write_log
 
-array_fields = {"tags", "images", "textEmbedding", "imageEmbedding"}
+string_array_fields = {"tags", "images"}
+number_array_fields = {"textEmbedding", "imageEmbedding"}
 empty_data_patterns = {"(empty)", "-"}
 no_conversion_needed = {"infinity", "inf", "+inf", "-inf", "+infinity", "-infinity", "Nan", "NaN", "nan"}
 
 def process_data(columnName, data):
   try:
+    # Check empty data
     if(data in empty_data_patterns): return handle_empty_data(data)
+    if(pd.isna(data)): return None
     
+    if(columnName in number_array_fields):
+      return [float(x) for x in data.split(",")]
+    
+    if(columnName in string_array_fields):
+      return data.split(",")
+    
+    # Check if any single string value is actually a number in string format
     if(isinstance(data, str) and is_number_as_string(data.replace(",", ""))):
       return string_to_number(data.replace(",", "")) if ',' in data else string_to_number(data)
     
-    if(columnName in array_fields):
-      if(data_source == KIBANA):
-        return string_to_array(data)
-      elif(data_source == JAVA):
-        return parse_java_list_strings(data)
-      elif(data_source == PYTHON):
-        return parse_python_array_literal(data)
-      
     return data
   
   except Exception as e:
@@ -38,11 +41,6 @@ def process_data(columnName, data):
         f"Traceback:\n{traceback.format_exc()}"
     )
     write_log(error_message)
-
-# Sample input: "scented candles, decorative candleholders, pillar candles"
-def string_to_array(data):
-  item_list = data.split(",")
-  return [string_to_number(item.strip()) if is_number_as_string(item.strip()) else item.strip() for item in item_list]
 
 def string_to_number(data):
   return int(data) if float(data).is_integer() else float(data)
@@ -58,13 +56,4 @@ def is_number_as_string(data):
 def handle_empty_data(data):
   if data == "(empty)": return ""
   if data == "-": return None
-  
-  
-def parse_java_list_strings(data):
-  return [item.strip() for item in data.strip("[]").split(",") if item.strip()]
-
-def parse_python_array_literal(data):
-  return ast.literal_eval(data) if data else None
-
-def parse_kibana_exported_array_strings(data):
-  return [item.strip() for item in data.split(",")]
+  if data == "nan": return None

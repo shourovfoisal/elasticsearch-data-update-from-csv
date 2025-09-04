@@ -7,7 +7,7 @@ def prepare_payload(row, doc, request_body_ndjson):
   metadata = { "update": { "_id": document_id } }
   payload = {"doc": doc}
   
-  if(add_upon_failure): payload['doc_as_upsert'] = True
+  if(add_upon_failure): payload['doc_as_upsert'] = True  # Add the document to the elasticsearch when the document id is not found
   
   request_body_ndjson.append(metadata)
   request_body_ndjson.append(payload)
