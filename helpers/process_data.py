@@ -24,7 +24,7 @@ def process_data(columnName, data):
       return [float(x) for x in data.split(",")]
     
     if(columnName in string_array_fields):
-      return data.split(",")
+      return [item.strip() for item in data.split(",")]
     
     # Check if any single string value is actually a number in string format
     if(isinstance(data, str) and is_number_as_string(data.replace(",", ""))):
