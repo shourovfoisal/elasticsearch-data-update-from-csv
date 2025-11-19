@@ -8,11 +8,20 @@ VENV_DIR = BASE_DIR / "venv"
 DEPENDENCIES_FILE = BASE_DIR / "core" / "dependencies.txt"
 
 def create_venv():
-  if not VENV_DIR.exists():
-    print("Creating virtual environment")
-    subprocess.check_call([sys.executable, "-m", "venv", str(VENV_DIR)])
-  else:
+  if VENV_DIR.exists():
     print("Virtual environment already exists")
+    return
+  
+  print("Creating virtual environment")
+  
+  try:
+    subprocess.check_call([sys.executable, "-m", "venv", str(VENV_DIR)])
+  except subprocess.CalledProcessError as e:
+    print("Failed to create venv. Trying to install the python3-venv package.")
+    if sys.platform.startswith("linux"):
+      python_version = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
+      print(f"Detected python version {python_version}")
+      
 
 def get_pip_executable():
   pip_executable_name = "pip.exe" if os.name == "nt" else "pip"
