@@ -33,9 +33,9 @@ def main():
   start_index = load_checkpoint()
 
   payload: NdjsonBody = []
-  for index, row in dataframe.iterrows(): # type: ignore
+  for row_number, (df_index, row) in enumerate(dataframe.iterrows()): # type: ignore
     
-    if index <= start_index:  # type: ignore
+    if row_number <= start_index:  # type: ignore
         continue
     
     doc: BulkRequestBody = dict()
@@ -44,13 +44,15 @@ def main():
     
     prepare_payload(row, doc, payload) # type: ignore
     
-    if((index+1) % batch_size == 0): # type: ignore
-      print_to_console(f"Batch {index + 1}") # type: ignore
+    if((row_number+1) % batch_size == 0):
+      print_to_console(f"Batch {row_number + 1}")
       send_with_retry(payload)
-      save_checkpoint(index=index) # type: ignore
+      
+      # save the LAST successfully processed row
+      save_checkpoint(row_number)
       payload.clear()
     
-    current_percentage: float = math.ceil(((index+1) / totalCount) * 100) # type: ignore
+    current_percentage: float = math.ceil(((row_number + 1) / totalCount) * 100)
     if(current_percentage % 5 == 0 and current_percentage != last_percentage):
       write_log_file(f"Progress {current_percentage}%", True)
       last_percentage = current_percentage
