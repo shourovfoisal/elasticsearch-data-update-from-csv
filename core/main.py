@@ -1,24 +1,25 @@
 import math
-import sys
-from time import time
-from core.configs import batch_size, es_index
+from time import time as time_func
+from core.configs import batch_size
 from helpers.process_data import process_data
-from helpers.payload_constructor import prepare_payload
-from helpers.request_executor import send_request
-from helpers.log import write_log, clear_log
+from helpers.payload_constructor import prepare_payload # type: ignore
+from helpers.request_executor import send_with_retry
+from helpers.checkpoint_manager import save_checkpoint, load_checkpoint, reset_checkpoint
+from helpers.log import write_log_file, clear_log_file, print_to_console
 from helpers.file_reader import read_file
+from typing import List, Dict, Any, TypeAlias
+from pandas import DataFrame
+
+BulkRequestBody: TypeAlias = Dict[str, Any]
+NdjsonBody: TypeAlias = List[Dict[str, Any]]
 
 def main():
   # Clear the log file before starting the program
-  clear_log()
-  
-  # Check if index name is provided
-  if not es_index.strip():
-    print("Error: 'es_index' is not set. Please set it in the .env file.")
-    sys.exit(1)
+  clear_log_file()
 
   # Read file
-  dataframe = read_file()
+  dataframe: DataFrame = read_file()
+  print_to_console("Dataframe read complete")
 
   # Updatable columns (the column 'id' is not needed here)
   columnNames = dataframe.columns.tolist()
@@ -26,30 +27,40 @@ def main():
 
   # Log purposes
   totalCount = len(dataframe)
-  tenPercentOfTotalCount = int(totalCount/10)
-  start_time = time()
+  start_time = time_func()
   last_percentage = -1
 
-  request_body_ndjson = []
-  for index, row in dataframe.iterrows():
-    doc = dict()
+  start_index = load_checkpoint()
+
+  payload: NdjsonBody = []
+  for index, row in dataframe.iterrows(): # type: ignore
+    
+    if index <= start_index:  # type: ignore
+        continue
+    
+    doc: BulkRequestBody = dict()
     for columnName in columnNames:
       doc[columnName]=process_data(columnName, row[columnName])
     
-    prepare_payload(row, doc, request_body_ndjson)
+    prepare_payload(row, doc, payload) # type: ignore
     
-    if((index+1) % batch_size == 0):
-      send_request(request_body_ndjson)
+    if((index+1) % batch_size == 0): # type: ignore
+      print_to_console(f"Batch {index + 1}") # type: ignore
+      send_with_retry(payload)
+      save_checkpoint(index=index) # type: ignore
+      payload.clear()
     
-    current_percentage = math.ceil(((index+1) / totalCount) * 100)
+    current_percentage: float = math.ceil(((index+1) / totalCount) * 100) # type: ignore
     if(current_percentage % 5 == 0 and current_percentage != last_percentage):
-      write_log(f"Progress {current_percentage}%", True)
+      write_log_file(f"Progress {current_percentage}%", True)
       last_percentage = current_percentage
 
   # Upload the remaining
-  if(len(request_body_ndjson) > 0): send_request(request_body_ndjson)
+  if(len(payload) > 0):
+    send_with_retry(payload)
+    reset_checkpoint()
 
-  write_log(f"Elapsed time {round(time() - start_time, 2)} seconds", True)
+  write_log_file(f"Elapsed time {round(time_func() - start_time, 2)} seconds", True)
   
 if __name__ == "__main__":
   main()

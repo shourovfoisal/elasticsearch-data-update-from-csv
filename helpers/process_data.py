@@ -1,20 +1,14 @@
-import ast
 import traceback
-from core.configs import data_source
-from core.const import (
-  DATA_SOURCE_PYTHON as PYTHON, 
-  DATA_SOURCE_JAVA as JAVA, 
-  DATA_SOURCE_KIBANA as KIBANA
-)
 import pandas as pd
-from helpers.log import write_log
+from helpers.log import write_log_file
+from typing import Any
 
 string_array_fields = {"tags", "images"}
 number_array_fields = {"textEmbedding", "imageEmbedding"}
 empty_data_patterns = {"(empty)", "-"}
 no_conversion_needed = {"infinity", "inf", "+inf", "-inf", "+infinity", "-infinity", "Nan", "NaN", "nan"}
 
-def process_data(columnName, data):
+def process_data(columnName: str, data: Any):
   try:
     # Check empty data
     if(data in empty_data_patterns): return handle_empty_data(data)
@@ -40,12 +34,12 @@ def process_data(columnName, data):
         f"Error: {str(e)}\n"
         f"Traceback:\n{traceback.format_exc()}"
     )
-    write_log(error_message)
+    write_log_file(error_message)
 
-def string_to_number(data):
+def string_to_number(data: str):
   return int(data) if float(data).is_integer() else float(data)
 
-def is_number_as_string(data):
+def is_number_as_string(data: str):
   try:
     if data in no_conversion_needed: return False
     float(data)
@@ -53,7 +47,7 @@ def is_number_as_string(data):
   except ValueError:
     return False
   
-def handle_empty_data(data):
+def handle_empty_data(data: str):
   if data == "(empty)": return ""
   if data == "-": return None
   if data == "nan": return None

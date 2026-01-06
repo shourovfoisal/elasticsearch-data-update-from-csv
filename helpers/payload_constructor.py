@@ -1,12 +1,18 @@
 import os
 from helpers.process_data import process_data
+from typing import List, Dict, Any, TypeAlias
+from pandas import Series
+
+NdjsonBody: TypeAlias = List[Dict[str, Any]]
+BulkRequestMeta: TypeAlias = Dict[str, Any]
+BulkRequestBody: TypeAlias = Dict[str, Any]
 
 add_upon_failure = bool(os.getenv("ES_ADD_DOCUMENT_IF_NOT_EXISTS"))
 
-def prepare_payload(row, doc, request_body_ndjson):
+def prepare_payload(row: Series[Any], doc: BulkRequestBody, payload: NdjsonBody):
   document_id = row['id'].replace(",", "")
-  request_meta = { "update": { "_id": document_id } }
-  request_body = {}
+  request_meta: BulkRequestMeta = { "update": { "_id": document_id } }
+  request_body: BulkRequestBody = {}
   
   if(add_upon_failure):
     request_body['doc_as_upsert'] = True  # Add the document to the elasticsearch when the document id is not found
@@ -14,5 +20,5 @@ def prepare_payload(row, doc, request_body_ndjson):
   
   request_body["doc"] = doc
   
-  request_body_ndjson.append(request_meta)
-  request_body_ndjson.append(request_body)
+  payload.append(request_meta)
+  payload.append(request_body)

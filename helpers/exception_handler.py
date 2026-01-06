@@ -1,8 +1,11 @@
 import sys
 import traceback
-from helpers.log import write_log
+from helpers.log import write_log_file
+from typing import List, Dict, Any, TypeAlias
 
-def handle_exception(e, request_body_ndjson):
+NdjsonBody: TypeAlias = List[Dict[str, Any]]
+
+def handle_exception(e: Exception, payload: NdjsonBody):
   # print("\nBulk upload exception")
   # print(e)
   # os.makedirs("error_json", exist_ok=True)
@@ -11,10 +14,10 @@ def handle_exception(e, request_body_ndjson):
   #   outfile.writelines(json.dumps(request_body_ndjson, ensure_ascii=False) + "\n")
   #   outfile.write("\n")
   error_message = f"[Exception] {type(e).__name__}: {e}"
-  if request_body_ndjson:
-    error_message += f"\n[Context] {repr(request_body_ndjson)}"
+  if payload:
+    error_message += f"\n[Context] {repr(payload)}"
   error_message += f"\n[Traceback]\n{traceback.format_exc()}"
 
   # Write to log
-  write_log(error_message)
+  write_log_file(error_message)
   sys.exit()
